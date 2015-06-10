@@ -13,28 +13,34 @@ In the following, I have not repeated those parts of the instructions that were 
 
 Show any code that is needed to load the data (i.e. read.csv())
 
-```{r}
+
+```r
 library(dplyr)
 activity <- unzip("repdata-data-activity.zip")
 activity.data <- read.csv(activity)
 ```
 ##Calculate the total number of steps taken per day
 
-```{r}
+
+```r
 steps.total <- activity.data %>%
   group_by(date) %>%
   summarise(total.steps = sum(steps, na.rm = T))
 ```
 
 ##Make a histogram of the total number of steps taken each day
-```{r}
+
+```r
 hist(steps.total$total.steps, xlab= "Steps by Day", 
      ylab ="Frequency of total", 
      main = "Histogram of Total Number of Steps taken each day")
 ```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
+
 ##Calculate and report the mean and median of the total number of steps taken per day
-```{r}
+
+```r
 steps.mean <- activity.data %>%
   group_by(date) %>%
   summarise(steps.mean = mean(steps, na.rm=T))
@@ -44,7 +50,32 @@ steps.median <- activity.data %>%
   summarise(median.steps = median(steps, na.rm=T))
 
 summary(steps.mean)
+```
+
+```
+##          date      steps.mean     
+##  2012-10-01: 1   Min.   : 0.1424  
+##  2012-10-02: 1   1st Qu.:30.6979  
+##  2012-10-03: 1   Median :37.3785  
+##  2012-10-04: 1   Mean   :37.3826  
+##  2012-10-05: 1   3rd Qu.:46.1597  
+##  2012-10-06: 1   Max.   :73.5903  
+##  (Other)   :55   NA's   :8
+```
+
+```r
 summary(steps.median)
+```
+
+```
+##          date     median.steps
+##  2012-10-01: 1   Min.   :0    
+##  2012-10-02: 1   1st Qu.:0    
+##  2012-10-03: 1   Median :0    
+##  2012-10-04: 1   Mean   :0    
+##  2012-10-05: 1   3rd Qu.:0    
+##  2012-10-06: 1   Max.   :0    
+##  (Other)   :55   NA's   :8
 ```
 
 #What is the average daily activity pattern?
@@ -53,7 +84,8 @@ Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis)
 and the average number of steps taken, averaged across all days (y-axis)
 
 ##average 5 minute intervals across days
-```{r}
+
+```r
 interval.mean <- activity.data %>%
   group_by(interval) %>%
   summarise(interval.steps = mean(steps, na.rm=T))
@@ -61,17 +93,23 @@ interval.mean <- activity.data %>%
 
 ## make the plot
 
-```{r}
+
+```r
 plot(interval.mean$interval, interval.mean$interval.steps, type ="l", xlab ="Interval", ylab="steps")
 ```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
 
   
 or qplot (instructions seemed specific to plot)
 
-```{r}
+
+```r
 library(ggplot2)
 qplot(interval.mean$interval, interval.mean$interval.steps, geom ="line", xlab ="Interval", ylab="steps")
 ```
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
 
    
 
@@ -80,8 +118,8 @@ qplot(interval.mean$interval, interval.mean$interval.steps, geom ="line", xlab =
 The following is adapted from [Stack Overflow](http://stackoverflow.com/questions/9981224/search-for-index-of-a-list-entry-in-r)
 
 
-```{r}
 
+```r
 find.steps <- function(val)interval.mean$interval[match(val, interval.mean$interval.steps)]
 
 max.steps <-max(interval.mean$interval.steps, na.rm="T")
@@ -90,8 +128,13 @@ max.steps <-max(interval.mean$interval.steps, na.rm="T")
 
 
 #Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
-```{r}
+
+```r
 sum(is.na(activity.data))
+```
+
+```
+## [1] 2304
 ```
 
 Devise a strategy for filling in all of the missing values in the dataset. 
@@ -103,7 +146,8 @@ The strategy used below is adapted from [r-help](http://www.mail-archive.com/r-h
 
 ##Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
-```{r}
+
+```r
 impute.mean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
 steps.imputed <- impute.mean(activity.data$steps)
 act.data2 <- activity.data
@@ -111,7 +155,8 @@ act.data2$steps <- steps.imputed
 ```
 ##Make a histogram of the total number of steps taken each day and 
 
-```{r}
+
+```r
 steps.total2 <- act.data2 %>%
   group_by(date) %>%
   summarise(total.steps = sum(steps, na.rm = T))
@@ -120,8 +165,11 @@ hist(steps.total2$total.steps, xlab= "Steps by Day",
      ylab ="Frequency of total", 
      main = "Histogram of Total Number of Steps (with imputed steps)")
 ```
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
 #Calculate and report the mean and median total number of steps taken per day. 
-```{r}
+
+```r
 steps.mean2 <- act.data2 %>%
   group_by(date) %>%
   summarise(steps.mean = mean(steps, na.rm=T))
@@ -131,7 +179,32 @@ steps.median2 <- act.data2 %>%
   summarise(median.steps = median(steps, na.rm=T))
 
 summary(steps.mean2)
+```
+
+```
+##          date      steps.mean     
+##  2012-10-01: 1   Min.   : 0.1424  
+##  2012-10-02: 1   1st Qu.:34.0938  
+##  2012-10-03: 1   Median :37.3826  
+##  2012-10-04: 1   Mean   :37.3826  
+##  2012-10-05: 1   3rd Qu.:44.4826  
+##  2012-10-06: 1   Max.   :73.5903  
+##  (Other)   :55
+```
+
+```r
 summary(steps.median2)
+```
+
+```
+##          date     median.steps   
+##  2012-10-01: 1   Min.   : 0.000  
+##  2012-10-02: 1   1st Qu.: 0.000  
+##  2012-10-03: 1   Median : 0.000  
+##  2012-10-04: 1   Mean   : 4.903  
+##  2012-10-05: 1   3rd Qu.: 0.000  
+##  2012-10-06: 1   Max.   :37.383  
+##  (Other)   :55
 ```
 ##Do these values differ from the estimates from the first part of the assignment? 
 Yes. We can see this by considering the summary data of the first and second part of the assignment. The difference can be seen in the 1st and 3rd quartile values.
@@ -162,7 +235,8 @@ Use the dataset with the filled-in missing values for this part.
 Create a new factor variable in the dataset with two levels 
 - "weekday" and "weekend" indicating whether a given date is 
 a weekday or weekend day.
-```{r}
+
+```r
 dayofweek <- weekdays(as.POSIXlt(act.data2$date))
 wkd <- as.logical(dayofweek != "Saturday" & dayofweek !="Sunday")
 
@@ -179,10 +253,12 @@ weekend.mean <- act.data2[act.data2$weekday=="weekend",] %>%
 ```
 
 #Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
-```{r}
+
+```r
 par(mfrow= c(2,1), mar = c(2,0,2,0))
 plot(weekday.mean, type="l", xlab= "5 Minute Interval", ylab="Average Number of Steps", main ="Weekday Data")
 plot(weekend.mean, type="l",xlab= "5 Minute Interval", ylab="Average Number of Steps", main ="Weekend Data")
-
 ```
+
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png) 
 
